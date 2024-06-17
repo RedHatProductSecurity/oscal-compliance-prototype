@@ -1,1 +1,1 @@
-compliance-to-policy @ git+https://github.com/oscal-compass/compliance-to-policy@main
+compliance-to-policy @ git+https://github.com/RedHatProductSecurity/compliance-to-policy@testing/prototype
