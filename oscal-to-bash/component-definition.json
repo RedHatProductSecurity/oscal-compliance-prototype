@@ -1,0 +1,142 @@
+{
+  "component-definition": {
+    "uuid": "cb0883eb-9cb9-465b-ac60-187091b0cbdb",
+    "metadata": {
+      "title": "Component definition for OSCAL to Bash Example Component Definition",
+      "last-modified": "2024-06-14T20:51:37.301099+00:00",
+      "version": "1.0",
+      "oscal-version": "1.0.4"
+    },
+    "components": [
+      {
+        "uuid": "33e62878-cec2-483d-8bd5-eb4c3be94b5b",
+        "type": "software",
+        "title": "FakeOS",
+        "description": "FakeOS is a fake Linux based operating system built by no one.",
+        "props": [
+          {
+            "name": "Rule_Id",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal",
+            "value": "sshd_set_client_alive_interval",
+            "remarks": "rule_set_0"
+          },
+          {
+            "name": "Rule_Description",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal",
+            "value": "SSH allows administrators to set a network responsiveness timeout interval. After this interval has passed, the unresponsive client will be automatically logged out.",
+            "remarks": "rule_set_0"
+          },
+          {
+            "name": "Parameter_Id",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal",
+            "value": "sshd_client_alive_interval",
+            "remarks": "rule_set_0"
+          },
+          {
+            "name": "Parameter_Description",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal",
+            "value": "SSH idle timeout value in seconds.",
+            "remarks": "rule_set_0"
+          },
+          {
+            "name": "Parameter_Value_Alternatives",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal",
+            "value": "{\"default\": \"300\", \"5min\": \"300\", \"10min\": \"600\", \"1min\": \"60\", \"15min\": \"900\"}",
+            "remarks": "rule_set_0"
+          },
+          {
+            "name": "Rule_Id",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal",
+            "value": "sshd_set_client_alive_count_max",
+            "remarks": "rule_set_1"
+          },
+          {
+            "name": "Rule_Description",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal",
+            "value": "Session lock should conceal information previously visible on the display with a publicly viewable image or blank screen with the additional caveat that none of the images convey sensitive information.",
+            "remarks": "rule_set_1"
+          },
+          {
+            "name": "Parameter_Id",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal",
+            "value": "sshd_client_alive_count_max",
+            "remarks": "rule_set_1"
+          },
+          {
+            "name": "Parameter_Description",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal",
+            "value": "This value sets the number of client alive messages which may be sent without sshd receiving any messages back from the client.",
+            "remarks": "rule_set_1"
+          },
+          {
+            "name": "Parameter_Value_Alternatives",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal",
+            "value": "{\"default\": \"3\", \"0\": \"0\", \"3\": \"3\"}",
+            "remarks": "rule_set_1"
+          }
+        ],
+        "control-implementations": [
+          {
+            "uuid": "b3a0c290-ae6a-42c6-9253-b70210b78fc8",
+            "source": "trestle://profiles/oscal_to_bash_example/profile.json",
+            "description": "Example Using NIST SP 800-53 Rev 5 Controls and SP 800-53A Rev 5 Assessment Procedures",
+            "set-parameters": [
+              {
+                "param-id": "sshd_client_alive_interval",
+                "values": [
+                  "300"
+                ]
+              },
+              {
+                "param-id": "sshd_client_alive_count_max",
+                "values": [
+                  "3"
+                ]
+              }
+            ],
+            "implemented-requirements": [
+              {
+                "uuid": "9a940335-0c42-4a32-b6b5-ff5690422b2e",
+                "control-id": "ac-2.5",
+                "description": "SSH allows administrators to set a network responsiveness timeout interval.  After this interval has passed, the unresponsive client will be automatically logged out.\n\nTo set this timeout interval, edit the following line in `/etc/ssh/sshd_config` as follows:",
+                "props": [
+                  {
+                    "name": "Rule_Id",
+                    "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal",
+                    "value": "sshd_set_client_alive_interval"
+                  },
+                  {
+                    "name": "implementation-status",
+                    "value": "impemented"
+                  }
+                ]
+              },
+              {
+                "uuid": "e9f831c8-c5cf-46b7-b829-efa069ca2bfa",
+                "control-id": "ac-11",
+                "description": "SSH allows administrators to set the number of client alive messages which may be sent without sshd receiving any messages back from the client. If this threshold is reached while client alive messages are being sent, sshd will disconnect the client, terminating the session.  This prevents further access to the system until the user re-establishes access using established identification and authentication procedures.\n\nTo set this timeout interval, edit the following line in `/etc/ssh/sshd_config` as follows:",
+                "props": [
+                  {
+                    "name": "Rule_Id",
+                    "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal",
+                    "value": "sshd_set_client_alive_count_max"
+                  },
+                  {
+                    "name": "implementation-status",
+                    "value": "implemented"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "uuid": "e8812eeb-2b57-4fc4-b167-5098682ebac5",
+        "type": "REPLACE_ME",
+        "title": "Inactivity Logout",
+        "description": "REPLACE_ME"
+      }
+    ]
+  }
+}
