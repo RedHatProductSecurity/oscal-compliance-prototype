@@ -29,7 +29,7 @@
           {
             "name": "Parameter_Id",
             "ns": "http://ibm.github.io/compliance-trestle/schemas/oscal/cd/ibmcloud",
-            "value": "ClientAliveCountMax",
+            "value": "client_alive_count_max",
             "remarks": "rule_set_0"
           },
           {
@@ -52,7 +52,7 @@
             "description": "NIST Special Publication 800-53 Revision 5 HIGH IMPACT BASELINE",
             "set-parameters": [
               {
-                "param-id": "ClientAliveCountMax",
+                "param-id": "client_alive_count_max",
                 "values": ["300"]
               }
             ],
@@ -94,13 +94,13 @@
           {
             "name": "Check_Id",
             "ns": "http://ibm.github.io/compliance-trestle/schemas/oscal/cd/ibmcloud",
-            "value": "sshd_set_keepalive",
+            "value": "oval_ssh_keepalive",
             "remarks": "rule_set_2"
           },
           {
             "name": "Check_Description",
             "ns": "http://ibm.github.io/compliance-trestle/schemas/oscal/cd/ibmcloud",
-            "value": "Check whether there are any supported versions.",
+            "value": "Check the sshd configuration.",
             "remarks": "rule_set_2"
           }
         ]

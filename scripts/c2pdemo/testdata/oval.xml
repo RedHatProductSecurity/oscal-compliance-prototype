@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<!--Adapted from Source: https://github.com/ComplianceAsCode/content/blob/dbd791b83ed04b18e18fc96c6e0c77b63e4e35d0/linux_os/guide/services/ssh/ssh_server/sshd_set_keepalive/oval/shared.xml-->
+<!--
+    SPDX license identifier: BSD-3-Clause
+    Copyright (c) 2012-2017, Red Hat, Inc.
+    All rights reserved.
+-->
+<ns0:oval_definitions
+  xmlns:ns0="http://oval.mitre.org/XMLSchema/oval-definitions-5"
+  xmlns:ns1="http://oval.mitre.org/XMLSchema/oval-common-5"
+  xmlns:ns2="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://oval.mitre.org/XMLSchema/oval-definitions-5 oval-definitions-schema.xsd
+                      http://oval.mitre.org/XMLSchema/oval-common-5 oval-common-schema.xsd
+                      http://oval.mitre.org/XMLSchema/oval-definitions-5#independent independent-definitions-schema.xsdi">
+
+  <ns0:generator>
+    <ns1:schema_version>5.11</ns1:schema_version>
+    <ns1:timestamp>2017-10-09T12:00:00</ns1:timestamp>
+  </ns0:generator>
+
+  <ns0:definitions>
+    <ns0:definition class="compliance" id="oval:oval_ssh_keepalive:def:1" version="1">
+    <ns0:metadata>
+      <ns0:title>SSH Max Keep Alive</ns0:title>
+      <ns0:description>Detailed description...</ns0:description>
+      <ns0:reference ref_id="oval_ssh_keepalive"/>
+    </ns0:metadata>
+    <ns0:criteria operator="AND">
+      <ns0:criterion comment="Check ClientAliveCountMax in /etc/ssh/sshd_config" test_ref="oval:test_sshd_set_keepalive_clientalivecountmax:tst:1"/>
+    </ns0:criteria>
+  </ns0:definition>
+  </ns0:definitions>
+
+  <ns0:tests>
+   <ns2:textfilecontent54_test id="oval:test_sshd_set_keepalive_clientalivecountmax:tst:1" check="all" check_existence="all_exist" 
+        comment="Check the value of ClientAliveCountMax setting in the /etc/ssh/sshd_config file" version="1">
+      <ns2:object object_ref="oval:object_sshd_set_keepalive_clientalivecountmax:obj:1"/>
+      <ns2:state state_ref="oval:state_sshd_set_keepalive_clientalivecountmax:ste:1"/>
+    </ns2:textfilecontent54_test>
+  </ns0:tests>
+
+  <ns0:objects>
+    <ns2:textfilecontent54_object id="oval:object_sshd_set_keepalive_clientalivecountmax:obj:1" version="2">
+      <ns2:filepath>/etc/ssh/sshd_config</ns2:filepath>
+      <ns2:pattern operation="pattern match">^[ \t]*(?i)ClientAliveCountMax(?-i)[ \t]+(.+?)[ \t]*(?:$|#)</ns2:pattern>
+      <ns2:instance operation="greater than or equal" datatype="int">1</ns2:instance>
+    </ns2:textfilecontent54_object>
+   
+  </ns0:objects>
+
+  <ns0:states>
+    <ns2:textfilecontent54_state id="oval:state_sshd_set_keepalive_clientalivecountmax:ste:1" version="2">
+    <ns2:subexpression var_check="all" datatype="int"
+      operation="equals" var_ref="oval:client_alive_count_max:var:1"/>
+    </ns2:textfilecontent54_state>
+  </ns0:states>
+
+  <ns0:variables>
+    <ns0:external_variable datatype="int" id="oval:client_alive_count_max:var:1" version="2" comment="ClientAliveCountMax value"/>
+  </ns0:variables>
+</ns0:oval_definitions>

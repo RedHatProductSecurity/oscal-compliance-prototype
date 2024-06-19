@@ -1,6 +1,9 @@
 # Copyright (c) 2024 Red Hat, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
+"""
+Run C2P with the OpenSCAP plugin
+"""
 
 import argparse
 from pathlib import Path
@@ -10,38 +13,44 @@ from c2p.framework.models.c2p_config import C2PConfig, ComplianceOscal  # type: 
 
 from . import openscap  # type: ignore
 
-TEST_DATA_DIR = 'testdata'
+TEST_DATA_DIR = "testdata"
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    '-c',
-    '--component_definition',
+    "-c",
+    "--component_definition",
     type=str,
-    default=f'{TEST_DATA_DIR}/component-definition.json',
-    help=f'Path to component-definition.json (default: {TEST_DATA_DIR}/component-definition.json',
+    default=f"{TEST_DATA_DIR}/component-definition.json",
+    help=f"Path to component-definition.json (default: {TEST_DATA_DIR}/component-definition.json",
     required=False,
 )
 parser.add_argument(
-    '-o',
-    '--out',
+    "--oval-ref",
     type=str,
-    help='Path to generated xccdf.xml',
+    help="Reference to OVAL file",
+    required=True,
+)
+parser.add_argument(
+    "-o",
+    "--out",
+    type=str,
+    help="Path to generated xccdf.xml",
     required=True,
 )
 args = parser.parse_args()
 
-with Path(args.out).open('w') as output:
+with Path(args.out).open("w") as output:
     # Setup c2p_config
     c2p_config = C2PConfig()
     c2p_config.compliance = ComplianceOscal()
     c2p_config.compliance.component_definition = args.component_definition
-    c2p_config.pvp_name = 'OpenSCAP'
-    c2p_config.result_title = 'OpenSCAP Assessment Results'
-    c2p_config.result_description = 'OSCAL Assessment Results from OpenSCAP'
+    c2p_config.pvp_name = "OpenSCAP"
+    c2p_config.result_title = "OpenSCAP Assessment Results"
+    c2p_config.result_description = "OSCAL Assessment Results from OpenSCAP"
 
     # Construct C2P
     c2p = C2P(c2p_config)
 
     # Transform OSCAL (Compliance) to Policy
-    config = openscap.PluginConfigOpenSCAP(output=output.name)
+    config = openscap.PluginConfigOpenSCAP(output=output.name, oval_ref=args.oval_ref)
     openscap.GeneratorPluginOpenSCAP(config).generate_pvp_policy(c2p.get_policy())
