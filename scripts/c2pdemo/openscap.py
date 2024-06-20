@@ -92,11 +92,11 @@ class GeneratorPluginOpenSCAP(GeneratorPluginSpec):
 
         # add_reference_title_elements(root, env_yaml)
         _add_version_xml(root)
-        _profile_to_xml(root, policy.rule_sets)
-        for rule in policy.rule_sets:
-            _rule_to_xml(root, rule, self.config.oval_ref)
+        _profile_to_xml(root, policy)
         for param in policy.parameters:
             _value_to_xml(root, param)
+        for rule in policy.rule_sets:
+            _rule_to_xml(root, rule, self.config.oval_ref)
 
         if hasattr(ET, "indent"):
             ET.indent(root, space="  ", level=0)
@@ -168,7 +168,7 @@ def _create_benchmark_xml_skeleton(benchmark_id: str):
 # Source: https://github.com/ComplianceAsCode/content/blob/1956744915d8423df889d49115c486332a8327be/ssg/build_yaml.py#L442C2-L500C56
 
 
-def _profile_to_xml(root, rules: List[RuleSet]):
+def _profile_to_xml(root, policy: Policy):
     element = ET.Element("{%s}Profile" % XCCDF12_NS)
     element.set("id", OSCAP_PROFILE + "example")
     title = add_sub_element(element, "title", XCCDF12_NS, "This Exampe Profile")
@@ -177,7 +177,7 @@ def _profile_to_xml(root, rules: List[RuleSet]):
     desc.set("override", "true")
 
     # Add selected rules
-    for rule in rules:
+    for rule in policy.rule_sets:
         select = ET.Element("{%s}select" % XCCDF12_NS)
         select.set("idref", OSCAP_RULE + rule.rule_id)
         select.set("selected", "true")
@@ -188,13 +188,11 @@ def _profile_to_xml(root, rules: List[RuleSet]):
 def _value_to_xml(root, parameter: Parameter):
     value = ET.Element("{%s}Value" % XCCDF12_NS)
     value.set("id", OSCAP_VALUE + parameter.id)
-    value.set("type", "type")
-    title = ET.SubElement(value, "{%s}title" % XCCDF12_NS)
-    title.text = "title"
-    add_sub_element(value, "description", XCCDF12_NS, parameter.description)
-
-    value_small = ET.SubElement(value, "{%s}value" % XCCDF12_NS)
-    value_small.text = str(parameter.value)
+    parameter_values = parameter.value.split(",")
+    for param in parameter_values:
+        value_small = ET.SubElement(value, "{%s}value" % XCCDF12_NS)
+        value_small.set('selector', str(param))
+        value_small.text = str(param)
 
     root.append(value)
 
