@@ -94,7 +94,7 @@
           {
             "name": "Check_Id",
             "ns": "http://ibm.github.io/compliance-trestle/schemas/oscal/cd/ibmcloud",
-            "value": "oval_ssh_keepalive",
+            "value": "oval:oval_ssh_keepalive:def:1",
             "remarks": "rule_set_2"
           },
           {
