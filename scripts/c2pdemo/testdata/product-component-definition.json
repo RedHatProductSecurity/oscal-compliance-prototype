@@ -1,0 +1,78 @@
+{
+  "component-definition": {
+    "uuid": "fff86296-a55f-4b4c-bec6-f89d0fef3569",
+    "metadata": {
+      "title": "Sample Product Component Definition",
+      "last-modified": "2024-06-02T07:14:14+00:00",
+      "version": "1.0",
+      "oscal-version": "1.0.4"
+    },
+    "components": [
+      {
+        "uuid": "ec59c356-4df9-412c-97df-52880e4c1c2c",
+        "type": "software",
+        "title": "FakeOS",
+        "description": "My fake operating system",
+        "props": [
+          {
+            "name": "Rule_Id",
+            "ns": "http://ibm.github.io/compliance-trestle/schemas/oscal/cd",
+            "value": "sshd_set_keepalive",
+            "remarks": "rule_set_0"
+          },
+          {
+            "name": "Rule_Description",
+            "ns": "http://ibm.github.io/compliance-trestle/schemas/oscal/cd",
+            "value": "The SSH server sends at most ClientAliveCountMax messages during a SSH session and waits for a response from the SSH client.",
+            "remarks": "rule_set_0"
+          },
+          {
+            "name": "Parameter_Id",
+            "ns": "http://ibm.github.io/compliance-trestle/schemas/oscal/cd/ibmcloud",
+            "value": "client_alive_count_max",
+            "remarks": "rule_set_0"
+          },
+          {
+            "name": "Parameter_Description",
+            "ns": "http://ibm.github.io/compliance-trestle/schemas/oscal/cd/ibmcloud",
+            "value": "Parameter values",
+            "remarks": "rule_set_0"
+          },
+          {
+            "name": "Parameter_Value_Alternatives",
+            "ns": "http://ibm.github.io/compliance-trestle/schemas/oscal/cd",
+            "value": "0,300,600",
+            "remarks": "rule_set_0"
+          }
+        ],
+        "control-implementations": [
+          {
+            "uuid": "0c336b5b-9258-4129-8406-805faf2ce198",
+            "source": "https://github.com/usnistgov/oscal-content/blob/main/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_HIGH-baseline_profile.json",
+            "description": "NIST Special Publication 800-53 Revision 5 HIGH IMPACT BASELINE",
+            "set-parameters": [
+              {
+                "param-id": "client_alive_count_max",
+                "values": ["300"]
+              }
+            ],
+            "implemented-requirements": [
+              {
+                "uuid": "30ed7cc3-b00d-45e0-b885-bd981a93654a",
+                "control-id": "ac-2.5",
+                "description": "",
+                "props": [
+                  {
+                    "name": "Rule_Id",
+                    "ns": "http://ibm.github.io/compliance-trestle/schemas/oscal/cd/ibmcloud",
+                    "value": "sshd_set_keepalive"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

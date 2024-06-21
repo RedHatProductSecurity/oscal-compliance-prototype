@@ -1,0 +1,84 @@
+{
+    "component-definition": {
+      "uuid": "fff86296-a55f-4b4c-bec6-f89d0fef3569",
+      "metadata": {
+        "title": "Sample Validation Component using OpenSCAP",
+        "last-modified": "2024-06-02T07:14:14+00:00",
+        "version": "1.0",
+        "oscal-version": "1.0.4"
+      },
+      "components": [
+        {
+          "uuid": "ec59c356-4df9-412c-97df-52880e4c1c2c",
+          "type": "software",
+          "title": "FakeOS",
+          "description": "My fake operating system",
+          "links": [
+            {
+              "href": "#b6beb914-7b59-4f87-9a6c-2855052fe7a8",
+              "rel": "validation"
+            }
+          ]
+        },
+        {
+          "uuid": "b6beb914-7b59-4f87-9a6c-2855052fe7a8",
+          "type": "validation",
+          "title": "OpenSCAP for FakeOS",
+          "description": "OpenSCAP Validation for FakeOS",
+          "props": [
+            {
+                "name": "validation-type",
+                "value": "policy-engine"
+            },
+            {
+                "name": "validation-reference",
+                "value": "fake_os_product_name"
+            },
+            {
+              "name": "Rule_Id",
+              "ns": "http://ibm.github.io/compliance-trestle/schemas/oscal/cd/ibmcloud",
+              "value": "sshd_set_keepalive",
+              "remarks": "rule_set_2"
+            },
+            {
+              "name": "Rule_Description",
+              "ns": "http://ibm.github.io/compliance-trestle/schemas/oscal/cd/ibmcloud",
+              "value": "The SSH server sends at most ClientAliveCountMax messages during a SSH session and waits for a response from the SSH client.",
+              "remarks": "rule_set_2"
+            },
+            {
+              "name": "Check_Id",
+              "ns": "http://ibm.github.io/compliance-trestle/schemas/oscal/cd/ibmcloud",
+              "value": "oval:oval_ssh_keepalive:def:1",
+              "remarks": "rule_set_2"
+            },
+            {
+              "name": "Check_Description",
+              "ns": "http://ibm.github.io/compliance-trestle/schemas/oscal/cd/ibmcloud",
+              "value": "Check the sshd configuration.",
+              "remarks": "rule_set_2"
+            }
+          ],
+          "links": [
+            {
+              "href": "#84cbf061-eb87-4ec1-8112-1f529232e907",
+              "rel": "validation-details"
+            }
+          ]
+        }
+      ],
+      "back-matter": {
+        "resources": [
+          {
+            "uuid": "84cbf061-eb87-4ec1-8112-1f529232e907",
+            "description": "Location of check and remediation code.",
+            "rlinks": [
+              {
+                "href": "https://github.com/RedHatProductSecurity/oscal-compliance-prototype/blob/main/checks"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
