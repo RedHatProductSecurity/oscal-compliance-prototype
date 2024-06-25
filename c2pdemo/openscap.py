@@ -6,11 +6,9 @@ openscap.py - Convert an OSCAL Component Definition with Trestle constructs
 into a XCCDF file that can be used by OpenSCAP.
 """
 
-import base64
-import bz2
 import datetime
 import re
-from typing import List, Optional
+from typing import Dict, List, Optional
 from xml.etree import ElementTree as ET
 
 from pydantic import Field
@@ -21,7 +19,7 @@ from c2p.framework.plugin_spec import (  # type: ignore
     CollectorPluginSpec,
     GeneratorPluginSpec,
 )
-from c2p.framework.models.pvp_result import ObservationByCheck, Subject  # type: ignore
+from c2p.framework.models.pvp_result import ObservationByRule, Subject # type: ignore
 from c2p.common.utils import get_datetime  # type: ignore
 
 from trestle.transforms.implementations.xccdf import _XccdfResult
@@ -30,6 +28,14 @@ from trestle.transforms.implementations.xccdf import _XccdfResult
 class PluginConfigOpenSCAP(PluginConfig):
     output: str = Field("xccdf.xml", title="Path to the generated XCCDF file")
     oval_ref: str = Field("oval.xml", title="Reference to OVAL file")
+
+
+ResultMapping: Dict[str, str] = {
+    "fail": "failure",
+    "pass": "pass",
+    "fixed": "pass",
+    "error": "error"
+}
 
 
 class CollectorPluginOpenSCAP(CollectorPluginSpec):
@@ -47,32 +53,38 @@ class CollectorPluginOpenSCAP(CollectorPluginSpec):
     def generate_pvp_result(self, raw_result: RawResult) -> PVPResult:
         """Construct a result from a Results Data stream (ARF)"""
         pvp_result: PVPResult = PVPResult()
-        observations: List[ObservationByCheck] = []
+        observations: List[ObservationByRule] = []
 
-        if not raw_result.data.startswith("<?xml"):
-            raw_result.data = bz2.decompress(base64.b64decode(raw_result))
         co_result = _XccdfResult(raw_result.data)
-
         rule_use_generator = co_result.rule_use_generator()
 
         for rule_use in rule_use_generator:
-            if self.rule_subset and rule_use.id_ in self.rule_subset:
-                observation = ObservationByCheck(
-                    check_id=rule_use.idref,
-                    methods=["AUTOMATED"],
-                    collected=get_datetime(),
-                )
-                observation.subjects = Subject(
-                    title=f"{rule_use.scanner_name} {rule_use.scanner_version}",
-                    type="resource",
-                    result=rule_use.result,
-                    resource_id=rule_use.id_,
-                    evaluated_on=rule_use.time,
-                    reason="",
-                )
-                observations.append(observation)
+            if self.rule_subset and rule_use.id_ not in self.rule_subset:
+                continue
 
-        pvp_result.observations_by_check = observations
+            # Get the original rule id
+            rule_id = rule_use.idref.replace(OSCAP_RULE, "", 1)
+
+            observation = ObservationByRule(
+                rule_id=rule_id,
+                methods=["AUTOMATED"],
+                collected=get_datetime(),
+            )
+
+            # TODO: There are registered component. Based on the rule the plugin
+            # should know the associated component and can add as a subject.
+            component_subject = Subject(
+                title="My Component",
+                type="component",
+                result=ResultMapping[rule_use.result],
+                resource_id=f"{rule_use.scanner_name} {rule_use.scanner_version}",
+                evaluated_on=rule_use.time,
+                reason="My reason",
+            )
+            observation.subjects = [component_subject]
+            observations.append(observation)
+
+        pvp_result.observations_by_rule = observations
         return pvp_result
 
 
@@ -105,6 +117,11 @@ class GeneratorPluginOpenSCAP(GeneratorPluginSpec):
             self.config.output, xml_declaration=True, encoding="utf-8"
         )
 
+
+# TODO[jpower432]: Load validation compdef to get rule to check mappings
+# All available checks for a component are registered here and advertise as capabilities to C2P.
+# Essentially a standardized validation component is used to configure the PVP.
+        
 
 # Below are helper function copied from ComplianceAsCode/content/ssg
 
@@ -145,7 +162,6 @@ OSCAP_RULE = "xccdf_%s.content_rule_" % OSCAP_VENDOR
 oval_namespace = "http://oval.mitre.org/XMLSchema/oval-definitions-5"
 
 # Source: https://github.com/ComplianceAsCode/content/blob/1956744915d8423df889d49115c486332a8327be/ssg/build_yaml.py#L414
-
 
 def _create_benchmark_xml_skeleton(benchmark_id: str):
     root = ET.Element("{%s}Benchmark" % XCCDF12_NS)

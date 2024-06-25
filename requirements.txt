@@ -1,1 +1,3 @@
 compliance-to-policy @ git+https://github.com/RedHatProductSecurity/compliance-to-policy@testing/prototype
+compliance-trestle==2.5.0
+fire
