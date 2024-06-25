@@ -28,8 +28,8 @@ class OpenScapCLI:
         """
         Parameters
         ----------
-        socket : string
-            Location of Unix Domain Socket without the unix prefix.
+        component_definition : string
+            Location of the product component definition to evaluate
         """
         self.c2p_config = C2PConfig()
         self.c2p_config.compliance = ComplianceOscal()
@@ -59,7 +59,7 @@ class OpenScapCLI:
 
     def collect(self, input: str) -> None:
         """
-        Collect results and transform into assessment plans.
+        Collect results and transform into an assessment result.
 
         Parameters
         ----------
