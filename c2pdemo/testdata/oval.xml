@@ -57,6 +57,6 @@
   </ns0:states>
 
   <ns0:variables>
-    <ns0:external_variable datatype="int" id="oval:client_alive_count_max:var:1" version="2" comment="ClientAliveCountMax value"/>
+    <ns0:external_variable id="oval:client_alive_count_max:var:1" version="1" datatype="int" comment="Value of ClientAliveCountMax"/>
   </ns0:variables>
 </ns0:oval_definitions>

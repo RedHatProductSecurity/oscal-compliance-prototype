@@ -7,6 +7,7 @@ into a XCCDF file that can be used by OpenSCAP.
 """
 
 import datetime
+import json
 import re
 from typing import Dict, List, Optional
 from xml.etree import ElementTree as ET
@@ -19,7 +20,7 @@ from c2p.framework.plugin_spec import (  # type: ignore
     CollectorPluginSpec,
     GeneratorPluginSpec,
 )
-from c2p.framework.models.pvp_result import ObservationByRule, Subject # type: ignore
+from c2p.framework.models.pvp_result import ObservationByRule, Subject  # type: ignore
 from c2p.common.utils import get_datetime  # type: ignore
 
 from trestle.transforms.implementations.xccdf import _XccdfResult
@@ -28,13 +29,16 @@ from trestle.transforms.implementations.xccdf import _XccdfResult
 class PluginConfigOpenSCAP(PluginConfig):
     output: str = Field("xccdf.xml", title="Path to the generated XCCDF file")
     oval_ref: str = Field("oval.xml", title="Reference to OVAL file")
+    check_to_remediation: str = Field(
+        "check-remediation-mapping.json", title="Check to remediation text"
+    )
 
 
 ResultMapping: Dict[str, str] = {
     "fail": "failure",
     "pass": "pass",
     "fixed": "pass",
-    "error": "error"
+    "error": "error",
 }
 
 
@@ -107,8 +111,13 @@ class GeneratorPluginOpenSCAP(GeneratorPluginSpec):
         _profile_to_xml(root, policy)
         for param in policy.parameters:
             _value_to_xml(root, param)
+
+        check_data: Dict[str, str]
+        with open(self.config.check_to_remediation) as f:
+            check_data = json.load(f)
+
         for rule in policy.rule_sets:
-            _rule_to_xml(root, rule, self.config.oval_ref)
+            _rule_to_xml(root, rule, self.config.oval_ref, check_data)
 
         if hasattr(ET, "indent"):
             ET.indent(root, space="  ", level=0)
@@ -121,7 +130,7 @@ class GeneratorPluginOpenSCAP(GeneratorPluginSpec):
 # TODO[jpower432]: Load validation compdef to get rule to check mappings
 # All available checks for a component are registered here and advertise as capabilities to C2P.
 # Essentially a standardized validation component is used to configure the PVP.
-        
+
 
 # Below are helper function copied from ComplianceAsCode/content/ssg
 
@@ -162,6 +171,7 @@ OSCAP_RULE = "xccdf_%s.content_rule_" % OSCAP_VENDOR
 oval_namespace = "http://oval.mitre.org/XMLSchema/oval-definitions-5"
 
 # Source: https://github.com/ComplianceAsCode/content/blob/1956744915d8423df889d49115c486332a8327be/ssg/build_yaml.py#L414
+
 
 def _create_benchmark_xml_skeleton(benchmark_id: str):
     root = ET.Element("{%s}Benchmark" % XCCDF12_NS)
@@ -207,13 +217,13 @@ def _value_to_xml(root, parameter: Parameter):
     parameter_values = parameter.value.split(",")
     for param in parameter_values:
         value_small = ET.SubElement(value, "{%s}value" % XCCDF12_NS)
-        value_small.set('selector', str(param))
+        value_small.set("selector", str(param))
         value_small.text = str(param)
 
     root.append(value)
 
 
-def _rule_to_xml(root, ruleset: RuleSet, oval_path: str):
+def _rule_to_xml(root, ruleset: RuleSet, oval_path: str, remediation: Dict[str, str]):
     rule = ET.Element("{%s}Rule" % XCCDF12_NS)
     rule.set("selected", "false")
     rule.set("id", OSCAP_RULE + ruleset.rule_id)
@@ -223,9 +233,26 @@ def _rule_to_xml(root, ruleset: RuleSet, oval_path: str):
 
     add_sub_element(rule, "rationale", XCCDF12_NS, "My rationale")
 
+    if ruleset.check_id in remediation:
+        fix_text = remediation.get(ruleset.check_id)
+        fix = ET.SubElement(rule, "{%s}fix" % XCCDF12_NS)
+        fix.set("system", "urn:xccdf:fix:script:sh")
+        fix.text = fix_text
+
+        # Temporarily hard-coding parameter information in the rule context
+        # Need to also determine how to structure a fix to make this value last
+        # value_ref = ET.SubElement(fix, "{%s}sub" % XCCDF12_NS)
+        # value_ref.set("idref", OSCAP_VALUE + "client_alive_count_max")
+
     check_parent = rule
     check = ET.SubElement(check_parent, "{%s}check" % XCCDF12_NS)
     check.set("system", oval_namespace)
+    check_export = ET.SubElement(check, "{%s}check-export" % XCCDF12_NS)
+
+    # Temporarily hard-coding parameter information in the rule context
+    check_export.set("export-name", "oval:client_alive_count_max:var:1")
+    check_export.set("value-id", OSCAP_VALUE + "client_alive_count_max")
+
     check_content_ref = ET.SubElement(check, "{%s}check-content-ref" % XCCDF12_NS)
     check_content_ref.set("href", oval_path)
     check_content_ref.set("name", ruleset.check_id)

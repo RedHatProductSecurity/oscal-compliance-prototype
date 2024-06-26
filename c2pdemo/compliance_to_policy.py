@@ -38,7 +38,9 @@ class OpenScapCLI:
         self.c2p_config.result_description = "OSCAL Assessment Results from OpenSCAP"
         self.c2p_config.compliance.component_definition = component_definition
 
-    def generate(self, output: str, oval_reference: str) -> None:
+    def generate(
+        self, output: str, oval_reference: str, check_to_remediation_ref: str
+    ) -> None:
         """
         Generate OpenSCAP policy artifacts from compliance artifacts.
 
@@ -46,12 +48,18 @@ class OpenScapCLI:
         ----------
         output : string
             Path to generated xccdf.xml
+        oval_reference: string
+            Path to oval reference with check information
+        check_to_remediation_ref: string
+            Path to check to remediation text mapping
         """
         with Path(output).open("w") as file:
             c2p = C2P(self.c2p_config)
             # Transform OSCAL (Compliance) to Policy
             config = openscap.PluginConfigOpenSCAP(
-                output=file.name, oval_ref=oval_reference
+                output=file.name,
+                oval_ref=oval_reference,
+                check_to_remediation=check_to_remediation_ref,
             )
             openscap.GeneratorPluginOpenSCAP(config).generate_pvp_policy(
                 c2p.get_policy()
@@ -69,10 +77,10 @@ class OpenScapCLI:
         pvp_result: PVPResult
         with open(input, "r") as f:
             check_results = f.read()
-            pvp_raw_result = RawResult(
-                data=check_results
+            pvp_raw_result = RawResult(data=check_results)
+            pvp_result = openscap.CollectorPluginOpenSCAP().generate_pvp_result(
+                pvp_raw_result
             )
-            pvp_result = openscap.CollectorPluginOpenSCAP().generate_pvp_result(pvp_raw_result)
 
         c2p = C2P(self.c2p_config)
         c2p.set_pvp_result(pvp_result)
