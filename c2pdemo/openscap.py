@@ -169,6 +169,7 @@ OSCAP_PROFILE = "xccdf_%s.content_profile_" % OSCAP_VENDOR
 OSCAP_GROUP = "xccdf_%s.content_group_" % OSCAP_VENDOR
 OSCAP_RULE = "xccdf_%s.content_rule_" % OSCAP_VENDOR
 oval_namespace = "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+var_replace_prefix = "xccdf_var"
 
 # Source: https://github.com/ComplianceAsCode/content/blob/1956744915d8423df889d49115c486332a8327be/ssg/build_yaml.py#L414
 
@@ -197,7 +198,7 @@ def _create_benchmark_xml_skeleton(benchmark_id: str):
 def _profile_to_xml(root, policy: Policy):
     element = ET.Element("{%s}Profile" % XCCDF12_NS)
     element.set("id", OSCAP_PROFILE + "example")
-    title = add_sub_element(element, "title", XCCDF12_NS, "This Exampe Profile")
+    title = add_sub_element(element, "title", XCCDF12_NS, "This Example Profile")
     title.set("override", "true")
     desc = add_sub_element(element, "description", XCCDF12_NS, "This is a test profile")
     desc.set("override", "true")
@@ -234,24 +235,32 @@ def _rule_to_xml(root, ruleset: RuleSet, oval_path: str, remediation: Dict[str, 
     add_sub_element(rule, "rationale", XCCDF12_NS, "My rationale")
 
     if ruleset.check_id in remediation:
-        fix_text = remediation.get(ruleset.check_id)
+        fix_text = remediation.get(ruleset.check_id, "")
         fix = ET.SubElement(rule, "{%s}fix" % XCCDF12_NS)
         fix.set("system", "urn:xccdf:fix:script:sh")
         fix.text = fix_text
 
-        # Temporarily hard-coding parameter information in the rule context
-        # Need to also determine how to structure a fix to make this value last
-        # value_ref = ET.SubElement(fix, "{%s}sub" % XCCDF12_NS)
-        # value_ref.set("idref", OSCAP_VALUE + "client_alive_count_max")
+        if ruleset.parameter:
+            value_ref = ET.Element("{%s}sub" % XCCDF12_NS)
+            value_ref.set("idref", OSCAP_VALUE + ruleset.parameter)
+            parts = re.split(var_replace_prefix, fix_text)
+
+            if parts:
+                fix.text = parts[0] 
+                text_after_vars = parts[1]
+                xccdfvarsub = ET.SubElement(
+                    fix, "{%s}sub" % XCCDF12_NS, idref=OSCAP_VALUE + ruleset.parameter)
+                xccdfvarsub.tail = text_after_vars
+                xccdfvarsub.set("use", "legacy")
 
     check_parent = rule
     check = ET.SubElement(check_parent, "{%s}check" % XCCDF12_NS)
     check.set("system", oval_namespace)
-    check_export = ET.SubElement(check, "{%s}check-export" % XCCDF12_NS)
 
-    # Temporarily hard-coding parameter information in the rule context
-    check_export.set("export-name", "oval:client_alive_count_max:var:1")
-    check_export.set("value-id", OSCAP_VALUE + "client_alive_count_max")
+    if ruleset.parameter:
+        check_export = ET.SubElement(check, "{%s}check-export" % XCCDF12_NS)
+        check_export.set("export-name", "oval:%s:var:1" % ruleset.parameter)
+        check_export.set("value-id", OSCAP_VALUE + ruleset.parameter)
 
     check_content_ref = ET.SubElement(check, "{%s}check-content-ref" % XCCDF12_NS)
     check_content_ref.set("href", oval_path)
