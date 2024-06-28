@@ -5,8 +5,10 @@
 Run C2P with the OpenSCAP plugin
 """
 
+import logging
 import os
 from pathlib import Path
+import subprocess
 
 import fire
 
@@ -39,7 +41,7 @@ class OpenScapCLI:
         self.c2p_config.compliance.component_definition = component_definition
 
     def generate(
-        self, output: str, oval_reference: str, check_to_remediation_ref: str
+        self, output: str, oval_reference: str, check_to_remediation_ref: str, plan: bool = False, fix: bool = False
     ) -> None:
         """
         Generate OpenSCAP policy artifacts from compliance artifacts.
@@ -65,7 +67,26 @@ class OpenScapCLI:
                 c2p.get_policy()
             )
 
-    def collect(self, input: str) -> None:
+        if not plan:
+            self._run(output, fix)
+
+    def _run(self, generated_path: str, fix: bool) -> str:
+        command = [
+            "oscap",
+            "xccdf",
+            "eval",
+            "--profile",
+            "profile_example",
+            "--results",
+            "results.xml",
+        ]
+        if fix:
+            command.append("--remediate")
+        command.append(generated_path)
+        subprocess.run(command)
+        logging.info("Writing results to results.xml")
+
+    def collect(self, input: str = "results.xml") -> None:
         """
         Collect results and transform into an assessment result.
 
