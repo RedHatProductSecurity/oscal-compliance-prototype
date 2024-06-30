@@ -130,12 +130,6 @@
             ]
           }
         ]
-      },
-      {
-        "uuid": "e8812eeb-2b57-4fc4-b167-5098682ebac5",
-        "type": "REPLACE_ME",
-        "title": "Inactivity Logout",
-        "description": "REPLACE_ME"
       }
     ]
   }
