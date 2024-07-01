@@ -16,6 +16,8 @@ from c2p.framework.c2p import C2P  # type: ignore
 from c2p.framework.models import PVPResult, RawResult
 from c2p.framework.models.c2p_config import C2PConfig, ComplianceOscal  # type: ignore
 
+# from c2p.framework.plugin_spec import PluginCapabilities, PluginCapabilitiesManager
+
 from . import openscap  # type: ignore
 
 TEST_DATA_DIR = os.path.join(os.path.dirname(__file__), "testdata")
@@ -40,8 +42,22 @@ class OpenScapCLI:
         self.c2p_config.result_description = "OSCAL Assessment Results from OpenSCAP"
         self.c2p_config.compliance.component_definition = component_definition
 
+    def configure(self) -> None:
+        """
+        Configure plugin rules and resources with the plugin manager.
+
+        Note: This will register all of the component/rules/parameters that are currently supported by
+        the plugin. This will be useful when defining a component and rules subset later with OSCAL AP.
+        """
+        raise NotImplementedError("This is not an implemented feature yet.")
+
     def generate(
-        self, output: str, oval_reference: str, check_to_remediation_ref: str, plan: bool = False, fix: bool = False
+        self,
+        output: str,
+        oval_reference: str,
+        check_to_remediation_ref: str,
+        plan: bool = False,
+        fix: bool = False,
     ) -> None:
         """
         Generate OpenSCAP policy artifacts from compliance artifacts.

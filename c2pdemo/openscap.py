@@ -75,8 +75,10 @@ class CollectorPluginOpenSCAP(CollectorPluginSpec):
                 collected=get_datetime(),
             )
 
-            # TODO: There are registered component. Based on the rule the plugin
-            # should know the associated component and can add as a subject.
+            # TODO[jpower432]: Load validation compdef to get rule to check mappings
+            # All available checks for a component are registered here and advertise as capabilities to C2P.
+            # Essentially a standardized validation component is used to configure the PVP.
+            # Registered component would go here in as the subject
             component_subject = Subject(
                 title="My Component",
                 type="component",
@@ -87,6 +89,8 @@ class CollectorPluginOpenSCAP(CollectorPluginSpec):
             )
             observation.subjects = [component_subject]
             observations.append(observation)
+
+            # TODO: Check details should be added to relevant evidence
 
         pvp_result.observations_by_rule = observations
         return pvp_result
@@ -125,11 +129,6 @@ class GeneratorPluginOpenSCAP(GeneratorPluginSpec):
         ET.ElementTree(root).write(
             self.config.output, xml_declaration=True, encoding="utf-8"
         )
-
-
-# TODO[jpower432]: Load validation compdef to get rule to check mappings
-# All available checks for a component are registered here and advertise as capabilities to C2P.
-# Essentially a standardized validation component is used to configure the PVP.
 
 
 # Below are helper function copied from ComplianceAsCode/content/ssg
@@ -246,10 +245,11 @@ def _rule_to_xml(root, ruleset: RuleSet, oval_path: str, remediation: Dict[str, 
             parts = re.split(var_replace_prefix, fix_text)
 
             if parts:
-                fix.text = parts[0] 
+                fix.text = parts[0]
                 text_after_vars = parts[1]
                 xccdfvarsub = ET.SubElement(
-                    fix, "{%s}sub" % XCCDF12_NS, idref=OSCAP_VALUE + ruleset.parameter)
+                    fix, "{%s}sub" % XCCDF12_NS, idref=OSCAP_VALUE + ruleset.parameter
+                )
                 xccdfvarsub.tail = text_after_vars
                 xccdfvarsub.set("use", "legacy")
 
