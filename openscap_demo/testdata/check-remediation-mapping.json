@@ -1,0 +1,3 @@
+{
+    "oval:oval_ssh_keepalive:def:1": "echo ClientAliveCountMax xccdf_var >> /etc/ssh/sshd_config"
+}
