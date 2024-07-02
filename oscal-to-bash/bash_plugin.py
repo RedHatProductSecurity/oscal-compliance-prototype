@@ -59,6 +59,11 @@ class BashPlugin(PluginSpec):
         pvp_result: PVPResult = PVPResult()
         observations: List[ObservationByCheck] = []
         results = raw_result.data.splitlines()
+
+        reasons = {
+            'pass': 'sshd_config contains correct setting',
+            'fail': 'sshd_config contains incorrect setting'
+        }
         for result in results:
             check_id, status = result.split('=')
             timestamp = get_datetime()
@@ -69,12 +74,12 @@ class BashPlugin(PluginSpec):
             )
 
             subject = Subject(
-                title=f'Auditree Check: {check_id}',
-                type='inventory-item',
+                title=f'Bash Example Check: {check_id}',
+                type='sshd_config',
                 result=status_dictionary[status] if status in status_dictionary else ResultEnum.Error,
                 resource_id=check_id,
                 evaluated_on=timestamp,
-                reason=status,
+                reason=f'Result status was {status}',
             ) 
             observation.subjects = [subject]
             observations.append(observation)

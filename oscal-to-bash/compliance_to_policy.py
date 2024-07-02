@@ -5,7 +5,6 @@ This module handles the compliance to policy transformation.
 import argparse 
 
 from c2p.framework.c2p import C2P
-from c2p.framework.models import RawResult
 from c2p.framework.models.c2p_config import C2PConfig, ComplianceOscal
 
 from bash_plugin import BashPluginConfig, BashPlugin
