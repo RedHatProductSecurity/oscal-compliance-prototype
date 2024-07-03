@@ -2,7 +2,7 @@
     "component-definition": {
       "uuid": "fff86296-a55f-4b4c-bec6-f89d0fef3569",
       "metadata": {
-        "title": "Sample Component using OpenSCAP",
+        "title": "Sample Component using Bash",
         "last-modified": "2024-06-02T07:14:14+00:00",
         "version": "1.0",
         "oscal-version": "1.0.4"
