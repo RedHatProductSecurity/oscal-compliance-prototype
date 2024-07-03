@@ -20,7 +20,7 @@ from c2p.framework.plugin_spec import (  # type: ignore
     CollectorPluginSpec,
     GeneratorPluginSpec,
 )
-from c2p.framework.models.pvp_result import ObservationByRule, Subject  # type: ignore
+from c2p.framework.models.pvp_result import ObservationByRule, ResultEnum, Subject  # type: ignore
 from c2p.common.utils import get_datetime  # type: ignore
 
 from trestle.transforms.implementations.xccdf import _XccdfResult
@@ -34,11 +34,11 @@ class PluginConfigOpenSCAP(PluginConfig):
     )
 
 
-ResultMapping: Dict[str, str] = {
-    "fail": "failure",
-    "pass": "pass",
-    "fixed": "pass",
-    "error": "error",
+ResultMapping = {
+    "fixed": ResultEnum.Pass,
+    "pass": ResultEnum.Pass,
+    "fail": ResultEnum.Failure,
+    "error": ResultEnum.Error,
 }
 
 
@@ -50,12 +50,12 @@ class CollectorPluginOpenSCAP(CollectorPluginSpec):
         self.rule_subset: List[str] = []
 
     def set_rule_subset(self, rulesets: List[RuleSet]) -> None:
-        """Generate an OpenSCAP custom profile from policy."""
+        """Define a subset of rules to collect for."""
         for rule in rulesets:
             self.rule_subset.append(rule.rule_id)
 
     def generate_pvp_result(self, raw_result: RawResult) -> PVPResult:
-        """Construct a result from a Results Data stream (ARF)"""
+        """Construct a result from XCCDF Results."""
         pvp_result: PVPResult = PVPResult()
         observations: List[ObservationByRule] = []
 
@@ -76,7 +76,8 @@ class CollectorPluginOpenSCAP(CollectorPluginSpec):
             )
 
             # TODO[jpower432]: Load validation compdef to get rule to check mappings
-            # All available checks for a component are registered here and advertise as capabilities to C2P.
+            # All available checks for a component are registered here and advertise as
+            # capabilities to C2P.
             # Essentially a standardized validation component is used to configure the PVP.
             # Registered component would go here in as the subject
             component_subject = Subject(
@@ -102,12 +103,12 @@ class GeneratorPluginOpenSCAP(GeneratorPluginSpec):
         super().__init__()
         self.config = config
 
-    # Question, do I need to create a data stream of is XCCDF enough?
     def generate_pvp_policy(self, policy: Policy):
         """Generate an OpenSCAP custom profile from policy."""
         self._generate_xccdf(policy)
 
     def _generate_xccdf(self, policy: Policy):
+        """Generate an OpenSCAP custom profile from policy."""
         root = _create_benchmark_xml_skeleton("someID")
 
         # add_reference_title_elements(root, env_yaml)
