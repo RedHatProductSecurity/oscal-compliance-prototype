@@ -1,0 +1,9 @@
+# Example sshd_config file
+#
+#Port 22
+#AddressFamily any
+#ListenAddress 0.0.0.0
+#ListenAddress ::
+ClientAliveInterval 30
+ClientAliveCountMax 3
+#MaxStartups 10:30:100
