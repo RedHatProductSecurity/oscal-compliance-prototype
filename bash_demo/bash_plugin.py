@@ -13,10 +13,8 @@ from c2p.framework.models import (
     Policy,
     Parameter,
     RawResult,
-    PVPResult,
 )
 from c2p.framework.models.pvp_result import (
-    Link,
     ObservationByCheck,
     PVPResult,
     ResultEnum,
@@ -32,11 +30,13 @@ status_dictionary = {
     'error': ResultEnum.Error,
 }
 
+
 class BashPluginConfig(PluginConfig):
     output_file: str = Field(
         default='sshd-check.config',
         title='Path to the generated config file.  (default: ./sshd-check.config)'
     )
+
 
 class BashPlugin(PluginSpec):
     def __init__(self, config: Optional[BashPluginConfig] = None) -> None:
@@ -79,8 +79,8 @@ class BashPlugin(PluginSpec):
                 result=status_dictionary[status] if status in status_dictionary else ResultEnum.Error,
                 resource_id=check_id,
                 evaluated_on=timestamp,
-                reason=f'Result status was {status}',
-            ) 
+                reason=reasons.get(status, f'Result was {status}'),
+            )
             observation.subjects = [subject]
             observations.append(observation)
 

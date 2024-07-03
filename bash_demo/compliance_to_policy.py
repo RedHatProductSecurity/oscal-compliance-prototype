@@ -2,7 +2,7 @@
 This module handles the compliance to policy transformation.
 """
 
-import argparse 
+import argparse
 
 from c2p.framework.c2p import C2P
 from c2p.framework.models.c2p_config import C2PConfig, ComplianceOscal
@@ -16,7 +16,7 @@ parser.add_argument(
     '--component-definition',
     type=str,
     default='./component-definition.json',
-    help=f'Path to component definition JSON file.',
+    help='Path to component definition JSON file.',
     required=False,
 )
 parser.add_argument(
@@ -24,9 +24,10 @@ parser.add_argument(
     '--output-file',
     type=str,
     default='./sshd-check.config',
-    help=f'Path to output results file.',
+    help='Path to output results file.',
     required=False,
 )
+
 
 def main():
     """
@@ -44,8 +45,9 @@ def main():
     config = BashPluginConfig(output_file=args.output_file)
     policy = c2p.get_policy()
     BashPlugin(config).generate_pvp_policy(policy)
-    
-    print("Policy file created successfully!")
+
+    print("Policy file created successfully!")  # noqa: T201
+
 
 if __name__ == '__main__':
     main()

@@ -6,6 +6,7 @@ compliance-to-policy:
 
 run-check:
 	sh ./sshd-check.sh
+.PHONY: run-check
 
 results-to-compliance:
 	@python -m results_to_compliance -c component-definition.json -r sshd-check.results
