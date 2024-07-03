@@ -10,15 +10,15 @@ import os
 from pathlib import Path
 import subprocess
 
-import fire
+import fire  # type: ignore
 
 from c2p.framework.c2p import C2P  # type: ignore
-from c2p.framework.models import PVPResult, RawResult
+from c2p.framework.models import PVPResult, RawResult  # type: ignore
 from c2p.framework.models.c2p_config import C2PConfig, ComplianceOscal  # type: ignore
 
 # from c2p.framework.plugin_spec import PluginCapabilities, PluginCapabilitiesManager
 
-from . import openscap  # type: ignore
+import openscap  # type: ignore
 
 TEST_DATA_DIR = os.path.join(os.path.dirname(__file__), "testdata")
 
@@ -86,7 +86,7 @@ class OpenScapCLI:
         if not plan:
             self._run(output, fix)
 
-    def _run(self, generated_path: str, fix: bool) -> str:
+    def _run(self, generated_path: str, fix: bool) -> None:
         command = [
             "oscap",
             "xccdf",
