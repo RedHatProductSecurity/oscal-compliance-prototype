@@ -38,7 +38,7 @@ class ComplyTimePrototype:
         self.component_definition = component_definition
         self.config_path = config_path
 
-    def configure(self, workspace: str) -> None:
+    def configure(self) -> None:
         """
         Determine the plugin and component definition per the component definitions and create a config.
         We are hard coding OpenSCAP as the plugin of course and running with that.
@@ -46,7 +46,6 @@ class ComplyTimePrototype:
         global_config = configparser.ConfigParser(
             interpolation=configparser.ExtendedInterpolation()
         )
-        global_config["global"] = {"workspace": workspace}
         global_config["OpenSCAP"] = {
             "results-title": "",
             "results-description": "",
