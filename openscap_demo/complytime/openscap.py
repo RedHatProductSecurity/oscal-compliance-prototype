@@ -5,18 +5,16 @@
 openscap.py - Convert an OSCAL Component Definition with Trestle constructs
 into a XCCDF file that can be used by OpenSCAP.
 """
-
+import configparser
 import datetime
 import json
 import re
 from typing import Dict, List, Optional
 from xml.etree import ElementTree as ET
 
-from pydantic import Field
-
 from c2p.framework.models import Policy, PVPResult, RawResult, RuleSet, Parameter  # type: ignore
 from c2p.framework.plugin_spec import (  # type: ignore
-    PluginConfig,
+    PluginCapabilities,
     CollectorPluginSpec,
     GeneratorPluginSpec,
 )
@@ -24,14 +22,6 @@ from c2p.framework.models.pvp_result import ObservationByRule, ResultEnum, Subje
 from c2p.common.utils import get_datetime  # type: ignore
 
 from trestle.transforms.implementations.xccdf import _XccdfResult
-
-
-class PluginConfigOpenSCAP(PluginConfig):
-    output: str = Field("xccdf.xml", title="Path to the generated XCCDF file")
-    oval_ref: str = Field("oval.xml", title="Reference to OVAL file")
-    check_to_remediation: str = Field(
-        "check-remediation-mapping.json", title="Check to remediation text"
-    )
 
 
 ResultMapping = {
@@ -44,10 +34,15 @@ ResultMapping = {
 
 class CollectorPluginOpenSCAP(CollectorPluginSpec):
 
-    def __init__(self, config: Optional[PluginConfigOpenSCAP] = None) -> None:
+    def __init__(self, config: configparser.SectionProxy) -> None:
         super().__init__()
         self.config = config
         self.rule_subset: List[str] = []
+
+    @property
+    def capabilities(self) -> PluginCapabilities:
+        """This is just a placeholder right now so there are no abstract methods."""
+        return PluginCapabilities()
 
     def set_rule_subset(self, rulesets: List[RuleSet]) -> None:
         """Define a subset of rules to collect for."""
@@ -99,7 +94,7 @@ class CollectorPluginOpenSCAP(CollectorPluginSpec):
 
 class GeneratorPluginOpenSCAP(GeneratorPluginSpec):
 
-    def __init__(self, config: PluginConfigOpenSCAP) -> None:
+    def __init__(self, config: configparser.SectionProxy) -> None:
         super().__init__()
         self.config = config
 
@@ -118,17 +113,17 @@ class GeneratorPluginOpenSCAP(GeneratorPluginSpec):
             _value_to_xml(root, param)
 
         check_data: Dict[str, str]
-        with open(self.config.check_to_remediation) as f:
+        with open(self.config["check_to_remediation"]) as f:
             check_data = json.load(f)
 
         for rule in policy.rule_sets:
-            _rule_to_xml(root, rule, self.config.oval_ref, check_data)
+            _rule_to_xml(root, rule, self.config["oval_ref"], check_data)
 
         if hasattr(ET, "indent"):
             ET.indent(root, space="  ", level=0)
 
         ET.ElementTree(root).write(
-            self.config.output, xml_declaration=True, encoding="utf-8"
+            self.config["output"], xml_declaration=True, encoding="utf-8"
         )
 
 
