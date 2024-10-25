@@ -1,3 +1,5 @@
-compliance-to-policy @ git+https://github.com/RedHatProductSecurity/compliance-to-policy@testing/prototype
-compliance-trestle==2.5.0
+compliance-to-policy @ git+https://github.com/RedHatProductSecurity/compliance-to-policy@291ecdf4d7072e4446070a80fce6d78221bef2e4
+compliance-trestle
 fire
+grpcio-tools
+protobuf

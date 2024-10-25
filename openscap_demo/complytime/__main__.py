@@ -7,12 +7,14 @@ Run C2P with the OpenSCAP plugin
 
 
 import fire  # type: ignore
-from complytime.complytime import ComplyTimePrototype
+from complytime.complytime import ComplyTimeClient
 
 
 def init() -> None:
     """Initialize complytime"""
-    fire.Fire(ComplyTimePrototype)
+    address = "unix:///tmp/example.sock"
+    sample_client = ComplyTimeClient(address)
+    fire.Fire(sample_client)
 
 
 if __name__ == "__main__":

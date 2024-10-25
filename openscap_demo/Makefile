@@ -1,5 +1,6 @@
-all: run collect
 SHELL := /bin/bash
+export  PYTHONWARNINGS:= ignore::UserWarning
+
 
 configure:
 	@python3 -m complytime configure
@@ -9,13 +10,9 @@ generate:
 	@python3 -m complytime generate --profile nist-high
 .PHONY: generate
 
-run:
-	@python3 -m complytime run
-.PHONY: run
-
-collect:
-	@python3 -m complytime collect
-.PHONY: collect
+scan:
+	@python3 -m complytime scan
+.PHONY: scan
 
 develop:
 	@python -m venv .venv

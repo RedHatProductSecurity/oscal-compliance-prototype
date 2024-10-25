@@ -167,3 +167,5 @@ results.xml
 *.proto
 *.results
 *.config
+
+assessment-results*
